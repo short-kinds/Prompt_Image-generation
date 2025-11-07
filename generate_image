@@ -1,0 +1,34 @@
+from openai import OpenAI
+import base64
+from IPython.display import display, Image as IPyImage
+import io
+
+
+def gpt_image_1(prompts, size: str="1024x1024", quality: str="medium"):
+    client = OpenAI(api_key="")
+
+    # 터미널에서 등록하는 게 안전 --> setx OPENAI_API_KEY "sk-xxxx"
+    # client = OpenAI()
+
+    if isinstance(prompts, str):
+        prompts = [prompts]
+
+    results = []
+    for i, p in enumerate(prompts, 1):
+        result = client.images.generate(
+            model="gpt-image-1",
+            prompt=p,
+            size=size,
+            quality=quality,
+        )
+
+        image_base64 = result.data[0].b64_json
+        image_bytes = base64.b64decode(image_base64)
+
+        filename = f"output_{i}.png"
+        with open(filename, "wb") as f:
+            f.write(image_bytes)
+        display(IPyImage(data=image_bytes))
+
+        print(f"이미지 생성 완료: {filename}")
+        results.append(filename)
