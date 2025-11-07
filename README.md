@@ -46,7 +46,8 @@
 <img width="1024" height="1024" alt="image" src="https://github.com/user-attachments/assets/dddb4380-5f2b-439e-beed-dcdc6283004f" />
 
 생성된 퀴즈:
-- "questions": [
+```{
+  "questions": [
     {
       "type": "mcq",
       "question": "현대차그룹은 사우디에서 어떤 위치에 있을까?",
@@ -55,3 +56,6 @@
       "explanation": "현대차그룹은 사우디 상반기 브랜드별 누적 판매 순위에서 2위에 있었습니다."
     }
   ]
+}
+```
+
