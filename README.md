@@ -31,9 +31,7 @@
    ↓
 [GPT-Image-1]
    └─ 4컷 만화 이미지(1024×1024) 생성
-출력: {"prompts": <str>, "quiz": <dict>, "images": <png files>}
-
----
+출력: {"prompts": <str>, "quiz": <dict>, "images": <png files>}```
 
 ## 📸 생성 예시 (Examples)
 
