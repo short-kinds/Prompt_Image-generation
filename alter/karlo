@@ -1,0 +1,47 @@
+from diffusers import UnCLIPPipeline
+import torch
+
+
+def karlo(cfg: dict):
+    pipe = UnCLIPPipeline.from_pretrained("kakaobrain/karlo-v1-alpha", torch_dtype=torch.float16)
+    pipe = pipe.to('cuda')
+
+    image = pipe(
+        prompt=cfg["prompt"],
+        num_images_per_prompt=cfg["num_images_per_prompt"],
+        prior_num_inference_steps=cfg["prior_num_inference_steps"],
+        decoder_num_inference_steps=cfg["decoder_num_inference_steps"],
+        super_res_num_inference_steps=cfg["super_res_num_inference_steps"],
+        prior_guidance_scale=cfg["prior_guidance_scale"],
+        decoder_guidance_scale=cfg["decoder_guidance_scale"],
+        generator=torch.Generator(device="cuda").manual_seed(int(cfg["seed"])),
+        output_type=cfg["output_type"],
+                 ).images[0]
+
+    image.save("./sample.png")
+
+
+if __name__ == '__main__':
+    cfg = {
+        # "prompt": "정 대표가 단호한 표정으로 기자회견을 하는 카툰 스타일 이미지.",     # 텍스트 프롬프트
+
+        "prompt": "a high-resolution photograph of a big red frog on a green leaf.",
+
+        # 한 번에 생성할 장수
+        "num_images_per_prompt": 1,
+
+        "prior_num_inference_steps": 25,  # 권장: 18–32
+        "decoder_num_inference_steps": 25,  # 권장: 18–32
+        "super_res_num_inference_steps": 7,  # 권장: 5–9   (64→256 업샘플 단계)
+
+        # - 높일수록 프롬프트 충실도↑, 다양성/자연스러움↓
+        "prior_guidance_scale": 4.0,  # 기본값 4.0, 권장: 3.5–5.0
+        "decoder_guidance_scale": 8.0,  # 기본값 8.0, 권장: 6–9
+
+        "seed": 42,
+
+        # 출력 형식
+        "output_type": "pil",  # "pil" | "np"
+    }
+
+    karlo(cfg)
