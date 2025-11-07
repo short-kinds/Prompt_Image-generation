@@ -1,5 +1,5 @@
-from img_generator import
-from prompt_quiz_generator import
+from img_generator import gpt_image_1
+from prompt_quiz_generator import llama3
 
 news_summaries = [
       "파트 1: 행정안전부는 민생회복 소비쿠폰 1차 신청·지급 첫날인 21일 신청 시작 3시간만에 지급 대상자의 약 8%에 해당하는 415만명이 신청했다고 밝혔다.",
