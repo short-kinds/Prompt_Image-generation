@@ -1,0 +1,23 @@
+import torch
+from diffusers import StableDiffusion3Pipeline
+from huggingface_hub import login
+login("")
+
+pipe = StableDiffusion3Pipeline.from_pretrained("stabilityai/stable-diffusion-3.5-medium", torch_dtype=torch.float16)
+pipe = pipe.to("cuda")
+
+prompt = "Generate a 1024x1024 cartoon-style illustration of Son Heung-Min as a central forward, standing with his arms raised in triumph, surrounded by a simple, clean background with no text, logos, or watermarks. The scene is set in a soccer stadium at sunset, with warm golden light casting across the grass and illuminating Son's triumphant expression. His hands are clenched into fists with thumbs up, showcasing realistic hand anatomy, and his facial features are exaggerated in a cartoonish manner. The overall color palette is vibrant and cohesive, with a focus on blues and whites to represent the team's colors and the sense of victory."
+# negative_prompt = "text, logos, blurry images, dark shadows, out of frame elements, extra limbs, unnatural facial expressions, overly complex background, unrealistic elements"
+
+generator = torch.Generator("cuda").manual_seed(24)
+
+image = pipe(
+    prompt=prompt,
+    # negative_prompt= negative_prompt,
+    generator=generator,
+    width=1024,
+    height=1024,
+    num_inference_steps=28,
+    guidance_scale=3.5,
+).images[0]
+image.save("sample.png")
