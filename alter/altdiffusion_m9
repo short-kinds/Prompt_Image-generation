@@ -1,0 +1,63 @@
+from diffusers import AltDiffusionPipeline, DPMSolverMultistepScheduler, EulerAncestralDiscreteScheduler
+import torch
+import json
+from pathlib import Path
+import importlib, diffusers
+
+# 로컬 model_index.json 경로
+local_dir = r"C:\Users\admin\AltDiffusion-m9\_AltDiffusion_m9_local"
+mi_path = Path(local_dir) / "model_index.json"
+
+# 1) JSON 읽기
+with mi_path.open("r", encoding="utf-8") as f:
+    model_index = json.load(f)
+
+if isinstance(model_index.get("text_encoder"), list):
+    model_index["text_encoder"] = ["alt_diffusion", "RobertaSeriesModelWithTransformation"]
+
+with mi_path.open("w", encoding="utf-8") as f:
+    json.dump(model_index, f, ensure_ascii=False, indent=2)
+
+try:
+    importlib.import_module("diffusers.pipelines.alt_diffusion")
+except ModuleNotFoundError:
+    dep_mod = importlib.import_module("diffusers.pipelines.deprecated.alt_diffusion")
+    setattr(diffusers.pipelines, "alt_diffusion", dep_mod)
+
+# 모델 로드
+pipe = AltDiffusionPipeline.from_pretrained(
+    local_dir,
+    torch_dtype=torch.float16,
+    # use_auth_token=os.environ.get("HF_TOKEN")
+)
+
+
+pipe = pipe.to("cuda")
+pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
+# pipe.scheduler = DPMSolverMultistepScheduler.from_config(
+#     pipe.scheduler.config,
+#     algorithm_type="dpmsolver++",
+#     use_karras_sigmas=True,
+#     timestep_spacing="karras"
+# )
+# pipe.scheduler = EulerAncestralDiscreteScheduler.from_config(pipe.scheduler.config)
+
+pipe.enable_attention_slicing()
+
+# 재현성을 위한 시드 고정
+generator = torch.Generator(device="cuda").manual_seed(42)
+
+#  프롬프트 설정
+prompt = ("카툰 스타일로 정 대표가 단호한 표정으로 발표하는 모습을 그려주세요. 배경은 너무 복잡하지 않은 기자회견장으로 설정하고, 중심에는 정 대표가 서 있습니다. 정 대표의 표정은 결연하고, 그의 손은 마이크를 잡고 있는 모습을 강조해주세요. 전체적인 분위기는 명확한 진실 규명과 역사적 책임을 강조하는 느낌으로 설정합니다.")
+negative_prompt = "text, logos, blurry images, dark shadows, out of frame elements, extra limbs, unnatural facial expressions, overly complex background, unrealistic elements"
+
+# 이미지 생성 및 저장
+image = pipe(prompt=prompt, negative_prompt=negative_prompt,
+             height=768, width=768,
+             generator=generator, num_inference_steps=50).images[0]
+
+image.save("sample.png")
+print("이미지 생성 완료")
+
+if __name__ == '__main__':
+    pass
