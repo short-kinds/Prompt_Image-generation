@@ -16,7 +16,7 @@
 2. **OpenAI GPT-Image-1 API**를 호출하여  
    - 프롬프트를 기반으로 **2×2 형태의 4컷 만화 이미지**를 생성  
 
-> ✅ 결과물: `"prompt"`(영문 프롬프트), `"quiz"`(한글 JSON), `"output_x.png"`(생성 이미지)
+> ✅ 결과물: `"prompt"`(영문 프롬프트, 이미지 생성에 사용), `"quiz"`(한글 JSON), `"output_x.png"`(생성 이미지)
 
 ---
 
@@ -31,7 +31,7 @@
    ↓
 [GPT-Image-1]
    └─ 4컷 만화 이미지(1024×1024) 생성
-출력: {"prompts": <str>, "quiz": <dict>, "images": <png files>}
+최종 출력: {"quiz": <dict>, "images": <png files>}
 ```
 
 ## 📸 생성 예시 (Examples)
